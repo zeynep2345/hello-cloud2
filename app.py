@@ -52,7 +52,7 @@ cur.execute("CREATE TABLE IF NOT EXISTS ziyaretciler (id SERIAL PRIMARY KEY, isi
 
 if request.method == "POST":
     isim = (request.from.get("isim")or"".strip()
-  if isim:
+if isim:
       cur.execute("INSERT INTO ziyaretciler (isim) VALUES (%s)", (isim,))
       conn.commit()
       
