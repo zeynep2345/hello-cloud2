@@ -48,7 +48,7 @@ def connect_db():
 def index():
     conn = connect_db()
     cur = conn.cursor()
-  cur.execute("CREATE TABLE IF NOT EXISTS ziyaretciler (id SERIAL PRIMARY KEY, isim TEXT)")
+cur.execute("CREATE TABLE IF NOT EXISTS ziyaretciler (id SERIAL PRIMARY KEY, isim TEXT)")
 
 if request.method == "POST":
     isim = request.from.get("isim")
