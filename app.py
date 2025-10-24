@@ -51,7 +51,7 @@ def index():
 cur.execute("CREATE TABLE IF NOT EXISTS ziyaretciler (id SERIAL PRIMARY KEY, isim TEXT)")
 
 if request.method == "POST":
-    isim = (request.from.get("isim")or"".strip()
+    isim = (request.form.get("isim")or"".strip()
     if isim:
       cur.execute("INSERT INTO ziyaretciler (isim) VALUES (%s)", (isim,))
       conn.commit()
