@@ -5,7 +5,7 @@ import psycopg2
 app = Flask(__name__)
 
 # Render'ın otomatik tanımladığı veritabanı bağlantı bilgisi (DATABASE_URL ortam değişkeni)
-DATABASE_URL = os.getenv
+DATABASE_URL = os.getenv("DATABASE_URL",
 
 #HTML ŞABLONU (tek sayfada from + liste)
 HTML = """
