@@ -9,6 +9,7 @@ CORS(app)
 # Ortam değişkeninden DATABASE_URL'i al
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
+    "postgresql://zeynep:PYeZmD8LNVFDbxCXkmq5vIGZMKy3n7H2@dpg-d4fkurc9c44c73brt8t0-a.oregon-postgres.render.com/hellocloud2_db_trl5"
 )
 
 def connect_db():
