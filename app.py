@@ -3,7 +3,7 @@ from flask_cors import CORS
 import psycopg2
 import os
 
-app = Flask(_name_)
+app = Flask(__name__)
 CORS(app)
 
 # Ortam değişkeninden (Render'dan) DATABASE_URL'i al
@@ -79,7 +79,7 @@ def ziyaretciler():
     # -------------------------------------------------------------
 
 # Uygulama Başlatma
-if _name_ == '_main_':
+if __name__ == '__main__':
     # Render için gerekli host ve port ayarları
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
