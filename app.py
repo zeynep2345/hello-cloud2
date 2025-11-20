@@ -7,7 +7,7 @@ app = Flask(_name_)
 CORS(app)
 
 # Ortam değişkeninden (Render'dan) DATABASE_URL'i al
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://zeynep:MeSjOGra7VoVAgE2iWDHb918JnjwXDCY@dpg-d4fkiq3e5dus7396lv1g-a.oregon-postgres.render.com/hellocloud2_db_yy11")
 
 def connect_db():
     try:
