@@ -6,17 +6,14 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# Ortam değişkeninden DATABASE_URL'i al
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://zeynep:PYeZmD8LNVFDbxCXkmq5vIGZMKy3n7H2@dpg-d4fkurc9c44c73brt8t0-a.oregon-postgres.render.com/hellocloud2_db_trl5"
-)
+# Ortam değişkeninden (Render'dan) DATABASE_URL'i al
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 def connect_db():
     try:
-        return psycopg2.connect(DATABASE_URL)
+        return psycopg2.connect(DATABASE_URL, sslmode="require")
     except Exception as e:
-        print(f"Database connection error: {e}")
+        print(f"Database connection error: {e}") 
         return None
 
 @app.route('/')
@@ -33,7 +30,6 @@ def ziyaretciler():
     try:
         cur = conn.cursor()
 
-        # TABLO OLUŞTURMA
         cur.execute("""
             CREATE TABLE IF NOT EXISTS ziyaretciler (
                 id SERIAL PRIMARY KEY,
@@ -41,10 +37,9 @@ def ziyaretciler():
             );
         """)
 
-        # POST
         if request.method == "POST":
             data = request.json
-            isim = data.get("isim")
+            isim = data.get("isim") 
 
             if isim:
                 cur.execute("INSERT INTO ziyaretciler (isim) VALUES (%s)", (isim,))
@@ -52,14 +47,13 @@ def ziyaretciler():
 
             return jsonify({"status": "eklendi", "isim": isim}), 201
 
-        # GET
         elif request.method == "GET":
             cur.execute("SELECT isim FROM ziyaretciler ORDER BY id DESC LIMIT 10")
             isimler = [row[0] for row in cur.fetchall()]
             return jsonify({"ziyaretciler": isimler})
 
     except Exception as e:
-        conn.rollback()
+        conn.rollback() 
         return jsonify({"error": str(e)}), 500
 
     finally:
@@ -71,4 +65,3 @@ def ziyaretciler():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
-
