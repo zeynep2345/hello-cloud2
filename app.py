@@ -1,67 +1,66 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-import psycopg2
+from flask import Flask , render_template_string , request
 import os
+import psycopg2
 
 app = Flask(__name__)
-CORS(app)
 
-# Ortam değişkeninden (Render'dan) DATABASE_URL'i al
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL" , "https://uygulama-2.onrender.com")
+HTML="""
+<!doctype html>
+<html>
+<head>
+    <title>Buluttan Selam!</title>
+    <style>
+    body { font-family: Arial; text-align: center; padding: 50px; background: #eef2f3; }
+    h1 { color: #333; }
+    form { margin: 20px auto; }
+    input { padding: 10px; font-size: 16px }
+    button { padding: 10px 15px; background: #4CAF50; color: white; border:none; border-radius: 6px; cursor:pointer; }
+    ul { list-style: none; padding: 0px; }
+    li { background: white; margin: 5px auto; width: 200px; padding: 8px; border-radius: 5px; }
+    
+    </style>
+</head>
+<body>
+    <h1>Buluttan Selam!</h1>
+    <p>Adını yaz, selamını bırak </p>
+    <form method= "POST">
+        <input type="text" name="isim" placeholder="Adını Yaz" required>
+        <button type="submit">Gönder</button>
+    </form>
+    <h3>Ziyaretçiler</h3>
+    <ul>
+        {% for ad in isimler %}
+            <li>{{ ad }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+"""
 
 def connect_db():
-    try:
-        return psycopg2.connect(DATABASE_URL, sslmode="require")
-    except Exception as e:
-        print(f"Database connection error: {e}") 
-        return None
-
-@app.route('/')
+  conn = psycopg
+  db_connection.connect(DATABASE_URL)
+  return conn
+  
+@app.route("/" , methods=["GET", "POST"])
 def index():
-    return jsonify({"status": "online", "message": "API is running. Use /ziyaretciler endpoint."}), 200
+  conn = connect_db()
+  cur = conn.cursor()
+  cur.execute("CREATE TABLE IF NOT EXISTS ziyaretciler (id SERIAL PRIMARY KEY, isim TEXT)")
 
-@app.route('/ziyaretciler', methods=['GET', 'POST'])
-def ziyaretciler():
-    conn = connect_db()
-    if not conn:
-        return jsonify({"error": "Veritabanına bağlanılamadı"}), 500
+  if request.method == "POST":
+      isim = request.form.get("isim")
+      if isim:
+          cur.execute("INSERT INTO ziyaretciler (isim) VALUES (%s)", (isim,))
+          conn.commit()
 
-    cur = None
-    try:
-        cur = conn.cursor()
+  cur.execute("SELECT isim FROM ziyaretciler ORDER BY id DESC LIMIT 10")
+  isimler = [row[0] for row in cur.fetchall()]
 
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS ziyaretciler (
-                id SERIAL PRIMARY KEY,
-                isim TEXT
-            );
-        """)
+  cur.close()
+  conn.close()
+  return render_template_string(HTML, isimler=isimler)
 
-        if request.method == "POST":
-            data = request.json
-            isim = data.get("isim") 
-
-            if isim:
-                cur.execute("INSERT INTO ziyaretciler (isim) VALUES (%s)", (isim,))
-                conn.commit()
-
-            return jsonify({"status": "eklendi", "isim": isim}), 201
-
-        elif request.method == "GET":
-            cur.execute("SELECT isim FROM ziyaretciler ORDER BY id DESC LIMIT 10")
-            isimler = [row[0] for row in cur.fetchall()]
-            return jsonify({"ziyaretciler": isimler})
-
-    except Exception as e:
-        conn.rollback() 
-        return jsonify({"error": str(e)}), 500
-
-    finally:
-        if cur:
-            cur.close()
-        if conn:
-            conn.close()
-
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+if __name__ == "__main__":
+  app.run(host="0.0.0.0", port=5000)
